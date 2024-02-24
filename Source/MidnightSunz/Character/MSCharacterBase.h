@@ -4,20 +4,40 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
 #include "msCharacterBase.generated.h"
 
+class UAbilitySystemComponent;
+class UAttributeSet;
+class UGameplayEffect;
+
 UCLASS()
-class MIDNIGHTSUNZ_API AmsCharacterBase : public ACharacter
+class MIDNIGHTSUNZ_API AmsCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	AmsCharacterBase();
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UAttributeSet* GetAttributeSet() const;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void InitAbilityActorInfo();
+	virtual void InitializeDefaultAttributes() const;
 
-public:
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 
+protected:
+	UPROPERTY(EditAnywhere)
+	float DefaultWalkSpped = 350.f;
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	UAttributeSet* AttributeSet;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitaltAttributes;
 };

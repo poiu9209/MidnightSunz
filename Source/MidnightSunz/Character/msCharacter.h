@@ -19,6 +19,11 @@ class MIDNIGHTSUNZ_API AmsCharacter : public AmsCharacterBase
 
 public:
 	AmsCharacter();
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+protected:
+	virtual void InitAbilityActorInfo() override;
 
 protected:
 	UPROPERTY(EditAnywhere)
