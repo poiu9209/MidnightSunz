@@ -33,6 +33,7 @@ void AmsCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void AmsCharacter::OnRep_PlayerState()

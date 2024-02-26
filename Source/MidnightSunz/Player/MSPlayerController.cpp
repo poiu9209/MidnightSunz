@@ -1,9 +1,27 @@
+
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "msPlayerController.h"
 #include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameFramework/Character.h"
+#include "MidnightSunz/Input/msEnhancedInputComponent.h"
+#include "MidnightSunz/AbilitySystem/msAbilitySystemComponent.h"
+#include "MidnightSunz/Interface/msCombatInterface.h"
+
+void AmsPlayerController::ShowDamageNumber_Implementation(ACharacter* TargetCharacter, float DamageAmount)
+{
+	if (!IsValid(TargetCharacter) && !IsLocalController())
+	{
+		return;
+	}
+
+	if (ImsCombatInterface* CombatInterface = Cast<ImsCombatInterface>(TargetCharacter))
+	{
+		CombatInterface->Execute_ShowDamageText(TargetCharacter, DamageAmount);
+	}
+}
 
 void AmsPlayerController::BeginPlay()
 {
@@ -29,8 +47,9 @@ void AmsPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UmsEnhancedInputComponent* EnhancedInputComponent = CastChecked<UmsEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	EnhancedInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void AmsPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -47,4 +66,33 @@ void AmsPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+}
+
+void AmsPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+}
+
+void AmsPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	if (auto ASC = GetAbilitySystemComponent())
+	{
+		ASC->AbilityInputTagReleased(InputTag);
+	}
+}
+
+void AmsPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	if (auto ASC = GetAbilitySystemComponent())
+	{
+		ASC->AbilityInputTagHeld(InputTag);
+	}
+}
+
+UmsAbilitySystemComponent* AmsPlayerController::GetAbilitySystemComponent()
+{
+	if (!AbilitySystemComponent)
+	{
+		AbilitySystemComponent = Cast<UmsAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return AbilitySystemComponent;
 }

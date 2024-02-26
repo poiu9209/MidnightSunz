@@ -4,6 +4,8 @@
 #include "msEnemy.h"
 #include "MidnightSunz/AbilitySystem/msAbilitySystemComponent.h"
 #include "MidnightSunz/AbilitySystem/Attributes/msAttributeSet.h"
+#include "MidnightSunz/UI/Widgets/msUserWidget.h"
+#include "Components/WidgetComponent.h"
 
 AmsEnemy::AmsEnemy()
 {
@@ -12,12 +14,42 @@ AmsEnemy::AmsEnemy()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
 	AttributeSet = CreateDefaultSubobject<UmsAttributeSet>(TEXT("AttributeSet"));
+
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	HealthBar->SetupAttachment(GetRootComponent());
 }
 
 void AmsEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
+	if (HasAuthority())
+	{
+		InitializeDefaultAttributes();
+	}
+
+	if (UmsUserWidget* HealthBarWidget = Cast<UmsUserWidget>(HealthBar->GetUserWidgetObject()))
+	{
+		HealthBarWidget->SetWidgetController(this);
+	}
+
+	if (const UmsAttributeSet* AS = Cast<UmsAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AS->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChange.Broadcast(Data.NewValue);
+			});
+
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AS->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChange.Broadcast(Data.NewValue);
+			});
+
+		OnHealthChange.Broadcast(AS->GetHealth());
+		OnMaxHealthChange.Broadcast(AS->GetMaxHealth());
+	}
 }
 
 void AmsEnemy::InitAbilityActorInfo()
