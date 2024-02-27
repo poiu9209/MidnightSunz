@@ -77,7 +77,6 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category = "Combat")
 	FOnCharacterEventSignature OnDie;
 
-	//TODO ? 제거? death 연출은 랙돌+Dissolve ?
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> DeathMontage;
 

@@ -17,7 +17,16 @@ class MIDNIGHTSUNZ_API AmsEnemy : public AmsCharacterBase
 public:
 	AmsEnemy();
 
+	// begin ImsCombatInterface
+	virtual void Die() override;
+	// end ImsCombatInterface
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float LifeSpan = 5.f;
+
 };

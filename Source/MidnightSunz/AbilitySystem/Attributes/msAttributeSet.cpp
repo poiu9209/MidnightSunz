@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "MidnightSunz/msGameplayTags.h"
 #include "MidnightSunz/Player/msPlayerController.h"
+#include "MidnightSunz/Interface/msCombatInterface.h"
 
 UmsAttributeSet::UmsAttributeSet()
 {
@@ -100,7 +101,10 @@ void UmsAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 			const bool bDie = NewHealth <= 0.f;
 			if (bDie)
 			{
-				//TODO! 
+				if (ImsCombatInterface* CombatInterface = Cast<ImsCombatInterface>(Properties.TargetAvataActor))
+				{
+					CombatInterface->Die();
+				}
 			}
 			else
 			{

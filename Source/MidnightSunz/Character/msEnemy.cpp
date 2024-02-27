@@ -19,6 +19,12 @@ AmsEnemy::AmsEnemy()
 	HealthBar->SetupAttachment(GetRootComponent());
 }
 
+void AmsEnemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
 void AmsEnemy::BeginPlay()
 {
 	Super::BeginPlay();

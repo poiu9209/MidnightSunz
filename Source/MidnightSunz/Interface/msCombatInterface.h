@@ -28,4 +28,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowDamageText(const float Damage);
+
+	virtual void Die() = 0;
 };
